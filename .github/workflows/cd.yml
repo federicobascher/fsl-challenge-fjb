@@ -1,0 +1,36 @@
+name: CD
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-lastest
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+
+      - name: build docker image
+        run: docker build -t rdicidr:latest ./app
+      
+      - name: save docker image
+        run: docker save rdicidr:latest | gzip > rdicidr.tar.gz
+      
+      - name: copy image to ec2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            docker load < /tmp/rdicidr.tar.gz
+            docker rm -f rdicidr || true
+            docker run -d \
+              --name rdicidr \
+              -- restart unless-stopped \
+              -p 80:80 \
+              rdicidr:latest
+            rm /tmp/rdicidr.tar.gz
