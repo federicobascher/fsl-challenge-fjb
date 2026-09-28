@@ -1,16 +1,16 @@
 FROM node:15 as builder
 
-WORKDIR codebase/rdicidr-0.1.0
+WORKDIR /app
 
 COPY package*.json ./
 
 RUN npm install
 
-COPY ..
+COPY . .
  
 RUN npm run build
 
-FROM ngnix:alpine
+FROM nginx:alpine
 
 COPY --from=builder /app/build /usr/share/ngnix/html
 
