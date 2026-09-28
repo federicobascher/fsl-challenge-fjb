@@ -23,11 +23,15 @@ jobs:
           node-version: '15'
           cache: npm
           cache-dependency-path: codebase/rdicidr-0.1.0/package-lock.json
+
       - name: install
         run: npm install
+        
       - name: lint
         run: npm run lint
+
       - name: test 
         run: CI=true npm run test
+        
       - name: build
         run: npm run build
