@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-lastest
+
+    defaults:
+      run:
+        working-directory: codebase/rdicidr-0.1.0
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+
+      - name: steup node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '15'
+          cache: npm
+          cache-dependency-path: codebase/rdicidr-0.1.0/package-lock.json
+      - name: install
+        run: npm install
+      - name: lint
+        run: npm run lint
+      - name: test 
+        run: CI=true npm run test
+      - name: build
+        run: npm run build
